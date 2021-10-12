@@ -18,7 +18,6 @@ const ingredientReducer = (currentIngredients, action) => {
 }
 
 // Example only
-
 const httpReducer = (currentHttpState, action) => {
   switch (action.type){
     case 'SEND':
