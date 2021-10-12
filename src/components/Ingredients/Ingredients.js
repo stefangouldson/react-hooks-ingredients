@@ -30,7 +30,7 @@ const Ingredients = () => {
 
       <section>
         <Search />
-        <IngredientList ingredients={ingredients} onRemoveItem={() => {}} /> 
+        <IngredientList ingredients={ingredients} onRemoveItem={(id) => {ingredientsDispatch({type: 'DELETE', id: id})}} /> 
      </section>
     </div>
   );
