@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useCallback, useMemo } from 'react';
 
 import IngredientForm from './IngredientForm';
 import Search from './Search';
@@ -36,20 +36,24 @@ const Ingredients = () => {
   const [ ingredients, ingredientsDispatch ] = useReducer(ingredientReducer, []);
   const [ httpState, httpDispatch ] = useReducer(httpReducer, {loading: false, error: null});
 
-  const addIngredientHandler = ingredient => {
+  const addIngredientHandler = useCallback(ingredient => {
     httpDispatch({type: 'SEND'});
     // set timeout as example
     setTimeout(() => {
       ingredientsDispatch({type: 'ADD', ingredient: { id: Math.random().toString(), ...ingredient}});
       httpDispatch({type: 'RESPONSE'});
     }, 1000)
-  }
+  }, [])
 
-  const deleteIngredientHandler = id => {
+  const deleteIngredientHandler = useCallback(id => {
     httpDispatch({type: 'SEND'});
     ingredientsDispatch({type: 'DELETE', id: id});
     httpDispatch({type: 'RESPONSE'});
-  }
+  }, [])
+
+  const ingredientList = useMemo(() => {
+    return <IngredientList ingredients={ingredients} onRemoveItem={deleteIngredientHandler} />
+  }, [ingredients, deleteIngredientHandler])
 
   return (
     <div className="App">
@@ -59,7 +63,7 @@ const Ingredients = () => {
 
         <section>
           <Search />
-          <IngredientList ingredients={ingredients} onRemoveItem={deleteIngredientHandler} /> 
+          {ingredientList}
         </section>
       </>
       )}
