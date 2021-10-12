@@ -1,17 +1,27 @@
-import React, { useState } from 'react';
+import React, { useReducer } from 'react';
 
 import IngredientForm from './IngredientForm';
 import Search from './Search';
 import IngredientList from './IngredientList';
 
+const ingredientReducer = (currentIngredients, action) => {
+  switch(action.type) {
+    case 'SET':
+      return action.ingredients;
+    case 'ADD':
+      return [...currentIngredients, action.ingredient];
+    case 'DELETE':
+      return currentIngredients.filter(ing => ing.id !== action.id);
+    default: 
+      throw new Error('Should not get there');
+  }
+}
+
 const Ingredients = () => {
-  const [ingredients, setIngredients] = useState([]);
+  const [ingredients, ingredientsDispatch] = useReducer(ingredientReducer, []);
 
   const addIngredientHandler = ingredient => {
-    setIngredients(prevIngredients => [
-      ...prevIngredients, 
-      { id: Math.random().toString(), ...ingredient}
-    ])
+    ingredientsDispatch({type: 'ADD', ingredient: { id: Math.random().toString(), ...ingredient}})
   }
 
   return (
