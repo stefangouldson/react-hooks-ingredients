@@ -17,21 +17,52 @@ const ingredientReducer = (currentIngredients, action) => {
   }
 }
 
+// Example only
+
+const httpReducer = (currentHttpState, action) => {
+  switch (action.type){
+    case 'SEND':
+      return { loading: true, error: null }
+    case 'RESPONSE':
+      return { ...currentHttpState, loading: false }
+    case 'ERROR':
+      return { loading: false, error: action.error }
+    default: 
+      throw new Error('Should not get there');
+  }
+}
+
 const Ingredients = () => {
-  const [ingredients, ingredientsDispatch] = useReducer(ingredientReducer, []);
+  const [ ingredients, ingredientsDispatch ] = useReducer(ingredientReducer, []);
+  const [ httpState, httpDispatch ] = useReducer(httpReducer, {loading: false, error: null});
 
   const addIngredientHandler = ingredient => {
-    ingredientsDispatch({type: 'ADD', ingredient: { id: Math.random().toString(), ...ingredient}})
+    httpDispatch({type: 'SEND'});
+    // set timeout as example
+    setTimeout(() => {
+      ingredientsDispatch({type: 'ADD', ingredient: { id: Math.random().toString(), ...ingredient}});
+      httpDispatch({type: 'RESPONSE'});
+    }, 1000)
+  }
+
+  const deleteIngredientHandler = id => {
+    httpDispatch({type: 'SEND'});
+    ingredientsDispatch({type: 'DELETE', id: id});
+    httpDispatch({type: 'RESPONSE'});
   }
 
   return (
     <div className="App">
-      <IngredientForm onAddIngredient={addIngredientHandler} />
+      {httpState.loading ? <h1 style={{textAlign: 'center'}}>Loading...</h1> : (
+      <>
+        <IngredientForm onAddIngredient={addIngredientHandler} />
 
-      <section>
-        <Search />
-        <IngredientList ingredients={ingredients} onRemoveItem={(id) => {ingredientsDispatch({type: 'DELETE', id: id})}} /> 
-     </section>
+        <section>
+          <Search />
+          <IngredientList ingredients={ingredients} onRemoveItem={deleteIngredientHandler} /> 
+        </section>
+      </>
+      )}
     </div>
   );
 }
